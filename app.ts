@@ -23,9 +23,11 @@ const server = new Drash.Server({
 });
 
 // Get tengine to compile all templates so they are ready during runtime
-tengine.compileTemplates([
-  "index.html",
-]);
+if (Deno.env.get("DRASH_COMPILE_TEMPLATES")) {
+  tengine.compileTemplates([
+    "index.html",
+  ]);
+}
 
 // Run your server
 server.run();

@@ -13,7 +13,6 @@ export class Jae {
    */
   public views_path = "";
 
-  #written_files: string[] = [];
   #renderers: Map<string, unknown> = new Map<string, unknown>();
 
   //////////////////////////////////////////////////////////////////////////////
@@ -55,6 +54,41 @@ export class Jae {
    * @returns The html to be rendered
    */
   public async render(template: string, data: unknown): Promise<string> {
+    const code = this.#getCode(template);
+
+    try {
+      if (!data) {
+        data = {};
+      }
+
+      // TODO(ericc): Performance degradation here since we add/remove the
+      // event listener on every request. Need a way to keep the event listern
+      // active and take in a new `deferred()` call every time it's called.
+
+      const jsPath = this.views_path + template.replace("html", "renderer.js");
+
+      let renderer = this.#renderers.get(jsPath);
+      if (!renderer) {
+        renderer = await import(
+          await Deno.realPath(jsPath)
+        );
+        this.#renderers.set(jsPath, renderer);
+      }
+
+      return (renderer as Renderer).buildTemplate(data);
+    } catch (err) {
+      console.error("'" + err.message + "'", " in \n\nCode:\n", code, "\n");
+    }
+
+    return "";
+  }
+
+  public async compileTemplate(template: string): Promise<void> {
+    const jsPath = this.views_path + template.replace("html", "renderer.js");
+    await Deno.writeFile(jsPath, encoder.encode(await this.#getCode(template)));
+  }
+
+  async #getCode(template: string): Promise<string> {
     let code = "export function buildTemplate(data) { let r = [];\n";
     let cursor = 0;
     let match;
@@ -118,31 +152,7 @@ export class Jae {
     }
 
     add(html.substr(cursor, html.length - cursor));
-    code = (code + 'return r.join(""); }').replace(/[\r\t\n]/g, " ");
 
-    try {
-      if (!data) {
-        data = {};
-      }
-
-      // TODO(ericc): Performance degradation here since we add/remove the
-      // event listener on every request. Need a way to keep the event listern
-      // active and take in a new `deferred()` call every time it's called.
-
-      const jsPath = this.views_path + template.replace("html", "renderer.js");
-      let renderer = this.#renderers.get(jsPath);
-      if (!renderer) {
-        renderer = await import(
-          await Deno.realPath(jsPath)
-        );
-        this.#renderers.set(jsPath, renderer);
-      }
-
-      return (renderer as Renderer).buildTemplate(data);
-    } catch (err) {
-      console.error("'" + err.message + "'", " in \n\nCode:\n", code, "\n");
-    }
-
-    return "";
+    return (code + 'return r.join(""); }').replace(/[\r\t\n]/g, " ");
   }
 }

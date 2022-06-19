@@ -24,12 +24,14 @@ export class TengineService extends Drash.Service {
   compileTemplates(templatePaths: string[]): void {
     console.log("Compiling templates.");
     templatePaths.forEach((templatePath: string) => {
-      console.log(`  -> Compiling ${templatePath}`);
-      this.#template_engine.render(
+      console.log(
+        `  -> Compiling ${this.#options.views_path + "/" + templatePath}`,
+      );
+      this.#template_engine.compileTemplate(
         "/" + templatePath,
-        {},
       );
     });
+    console.log("All templates compiled.");
   }
 
   runAtStartup(options: Drash.Interfaces.IServiceStartupOptions): void {
