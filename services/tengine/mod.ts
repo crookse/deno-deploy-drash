@@ -1,5 +1,5 @@
 import { Drash } from "../../deps.ts";
-import { Jae } from "./jae.ts";
+import { Jae } from "./jae_write_file.ts";
 
 interface IOptions {
   // deno-lint-ignore camelcase
