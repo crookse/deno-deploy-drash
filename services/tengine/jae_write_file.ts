@@ -14,7 +14,7 @@ export class Jae {
   public views_path = "";
 
   #written_files: string[] = [];
-  #renderers: Map<string, unknown> = new Map<string, unknown>()
+  #renderers: Map<string, unknown> = new Map<string, unknown>();
 
   //////////////////////////////////////////////////////////////////////////////
   // FILE MARKER - CONSTRUCTOR /////////////////////////////////////////////////
@@ -27,6 +27,7 @@ export class Jae {
    */
 
   constructor(viewsPath: string) {
+    console.log("Executing Jae");
     this.views_path = viewsPath;
   }
 
@@ -91,7 +92,7 @@ export class Jae {
         template = decoder.decode(
           await Deno.readFile(path),
         );
-        html = html.replace(m, template);;
+        html = html.replace(m, template);
       }
       break;
     }
@@ -145,7 +146,6 @@ export class Jae {
       }
 
       return (renderer as Renderer).buildTemplate(data);
-
     } catch (err) {
       console.error("'" + err.message + "'", " in \n\nCode:\n", code, "\n");
     }

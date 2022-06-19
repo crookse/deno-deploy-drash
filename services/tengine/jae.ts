@@ -48,7 +48,8 @@ export class Jae {
    * @returns The html to be rendered
    */
   public async render(template: string, data: unknown): Promise<string> {
-    let code = "self.onmessage = (event) => { const html = buildTemplate(event.data.vars); self.postMessage(html); }; function buildTemplate(data) { let r = [];\n";
+    let code =
+      "self.onmessage = (event) => { const html = buildTemplate(event.data.vars); self.postMessage(html); }; function buildTemplate(data) { let r = [];\n";
     let cursor = 0;
     let match;
     const filepath = this.views_path + template;
@@ -85,7 +86,7 @@ export class Jae {
         template = decoder.decode(
           await Deno.readFile(path),
         );
-        html = html.replace(m, template);;
+        html = html.replace(m, template);
       }
       break;
     }
@@ -128,25 +129,24 @@ export class Jae {
       // console.log(code);
 
       if (!w) {
-        let blob = new Blob([code], { type: 'text/javascript' })
+        let blob = new Blob([code], { type: "text/javascript" });
         w = new Worker(URL.createObjectURL(blob), { type: "module" });
         this.#workers.set(code, w);
       }
 
       const throwAwayListener = (e: any) => {
         p.resolve(e.data);
-      }
+      };
 
       w.addEventListener("message", throwAwayListener);
 
       w.postMessage({
-        vars: data
-      })
+        vars: data,
+      });
 
       const rendered = await p;
       w!.removeEventListener("message", throwAwayListener);
       return rendered;
-
     } catch (err) {
       console.error("'" + err.message + "'", " in \n\nCode:\n", code, "\n");
     }
