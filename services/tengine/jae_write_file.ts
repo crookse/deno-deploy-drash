@@ -130,13 +130,6 @@ export class Jae {
       // active and take in a new `deferred()` call every time it's called.
 
       const jsPath = this.views_path + template.replace("html", "renderer.js");
-      const written = this.#written_files.includes(jsPath);
-
-      if (!written) {
-        await Deno.writeFile(jsPath, encoder.encode(code));
-        this.#written_files.push(jsPath);
-      }
-
       let renderer = this.#renderers.get(jsPath);
       if (!renderer) {
         renderer = await import(
