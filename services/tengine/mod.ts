@@ -28,7 +28,7 @@ export class TengineService extends Drash.Service {
         `  -> Compiling ${this.#options.views_path + "/" + templatePath}`,
       );
       this.#template_engine.compileTemplate(
-        "/" + templatePath,
+        templatePath,
       );
     });
     console.log("All templates compiled.");
@@ -42,7 +42,6 @@ export class TengineService extends Drash.Service {
 
   runBeforeResource(_request: Drash.Request, response: Drash.Response) {
     response.headers.set("Content-Type", "text/html");
-    console.log("We're running before resource.");
     // @ts-ignore
     response.render = async (filepath: string, data: unknown) => {
       return await this.#template_engine.render(filepath, data);

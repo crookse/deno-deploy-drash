@@ -1,4 +1,5 @@
 import { deferred } from "../../deps.ts";
+import { buildTemplate as buildIndex } from "../../views/index.renderer.js"
 
 const decoder = new TextDecoder("utf-8");
 const encoder = new TextEncoder();
@@ -67,15 +68,14 @@ export class Jae {
 
       const jsPath = this.views_path + template.replace("html", "renderer.js");
 
-      let renderer = this.#renderers.get(jsPath);
-      if (!renderer) {
-        renderer = await import(
-          await Deno.realPath(jsPath)
-        );
-        this.#renderers.set(jsPath, renderer);
+      // Based on the jsPath, determine which template to use.
+      switch (jsPath) {
+        case "./views/index.renderer.js":
+          return buildIndex(data);
+        default:
+          break
       }
 
-      return (renderer as Renderer).buildTemplate(data);
     } catch (err) {
       console.error("'" + err.message + "'", " in \n\nCode:\n", code, "\n");
     }

@@ -24,9 +24,13 @@ const server = new Drash.Server({
 
 // Get tengine to compile all templates so they are ready during runtime
 if (Deno.env.get("DRASH_COMPILE_TEMPLATES")) {
+  console.log("Compile flag is set.");
+  // Paths are relative to `TengineService.views_path` above
   tengine.compileTemplates([
-    "index.html",
+    "/index.html",
   ]);
+} else {
+  console.log("Compile flag is not set.");
 }
 
 // Run your server
